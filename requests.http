@@ -1,0 +1,86 @@
+### Ready-to-run requests for VS Code (REST Client extension) and PhpStorm.
+### Start the server first:  php artisan serve
+
+@host = http://localhost:8000/api
+
+### 1. Register
+POST {{host}}/auth/register
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "Ada Lovelace",
+  "email": "ada@example.com",
+  "password": "secret-password"
+}
+
+### 2. Login (or use the seeded demo account: demo@example.com / password)
+# @name login
+POST {{host}}/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "email": "demo@example.com",
+  "password": "password"
+}
+
+###
+@token = {{login.response.body.token}}
+
+### 3. Current user
+GET {{host}}/auth/me
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### 4. List projects (filters: status, search, per_page)
+GET {{host}}/projects?status=active&search=&per_page=10
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### 5. Create a project
+# @name createProject
+POST {{host}}/projects
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Website redesign",
+  "description": "New marketing site"
+}
+
+###
+@projectId = {{createProject.response.body.data.id}}
+
+### 6. Create a task
+POST {{host}}/projects/{{projectId}}/tasks
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Write the homepage copy",
+  "priority": "high",
+  "due_date": "2030-01-15"
+}
+
+### 7. List tasks of a project (filters: status, priority)
+GET {{host}}/projects/{{projectId}}/tasks?status=todo
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### 8. Update a task
+PATCH {{host}}/tasks/1
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "status": "done"
+}
+
+### 9. Logout (revokes this token)
+POST {{host}}/auth/logout
+Accept: application/json
+Authorization: Bearer {{token}}
